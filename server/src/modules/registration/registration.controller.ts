@@ -7,7 +7,7 @@ const registrationService = new RegistrationService();
 export class RegistrationController {
   async register(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const registration = await registrationService.register(req.params.eventId, req.user._id);
+      const registration = await registrationService.register((req.params.eventId as string), req.user._id);
       res.status(201).json({ success: true, data: registration });
     } catch (error) {
       next(error);
@@ -16,7 +16,7 @@ export class RegistrationController {
 
   async cancel(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await registrationService.cancel(req.params.eventId, req.user._id);
+      const result = await registrationService.cancel((req.params.eventId as string), req.user._id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -34,7 +34,7 @@ export class RegistrationController {
 
   async getEventRegistrations(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const registrations = await registrationService.getEventRegistrations(req.params.eventId, req.user._id);
+      const registrations = await registrationService.getEventRegistrations((req.params.eventId as string), req.user._id);
       res.json({ success: true, data: registrations });
     } catch (error) {
       next(error);

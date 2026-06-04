@@ -18,7 +18,7 @@ export class AdminController {
 
   async deletePost(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await communityService.deletePost(req.params.id, req.user._id, true);
+      const result = await communityService.deletePost((req.params.id as string), req.user._id, true);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -27,7 +27,7 @@ export class AdminController {
 
   async promoteUser(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await adminService.promoteToAdmin(req.params.id);
+      const result = await adminService.promoteToAdmin((req.params.id as string));
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -46,7 +46,7 @@ export class AdminController {
   async moderateOrg(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { status } = req.body;
-      const data = await adminService.moderateOrganization(req.params.id, status);
+      const data = await adminService.moderateOrganization((req.params.id as string), status);
       res.json({ success: true, data });
     } catch (error) {
       next(error);
@@ -56,7 +56,7 @@ export class AdminController {
   async moderateEvt(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { status } = req.body;
-      const data = await adminService.moderateEvent(req.params.id, status);
+      const data = await adminService.moderateEvent((req.params.id as string), status);
       res.json({ success: true, data });
     } catch (error) {
       next(error);

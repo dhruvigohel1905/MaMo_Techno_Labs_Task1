@@ -36,7 +36,7 @@ export class AuthController {
 
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await authService.resetPassword(req.params.token, req.body.password);
+      const result = await authService.resetPassword((req.params.token as string), req.body.password);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

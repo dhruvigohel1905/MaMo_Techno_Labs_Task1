@@ -18,7 +18,7 @@ export class UserController {
 
   async getUserById(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const user = await userService.getUserById(req.params.id);
+      const user = await userService.getUserById((req.params.id as string));
       res.json({ success: true, data: user });
     } catch (error) {
       next(error);
@@ -27,7 +27,7 @@ export class UserController {
 
   async toggleUserStatus(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const user = await userService.toggleUserStatus(req.params.id);
+      const user = await userService.toggleUserStatus((req.params.id as string));
       res.json({ success: true, data: user });
     } catch (error) {
       next(error);
@@ -36,7 +36,7 @@ export class UserController {
 
   async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await userService.deleteUser(req.params.id);
+      const result = await userService.deleteUser((req.params.id as string));
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

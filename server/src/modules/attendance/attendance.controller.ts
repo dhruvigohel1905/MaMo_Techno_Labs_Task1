@@ -18,7 +18,7 @@ export class AttendanceController {
 
   async getEventAttendance(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const attendance = await attendanceService.getEventAttendance(req.params.eventId, req.user._id);
+      const attendance = await attendanceService.getEventAttendance((req.params.eventId as string), req.user._id);
       res.json({ success: true, data: attendance });
     } catch (error) {
       next(error);

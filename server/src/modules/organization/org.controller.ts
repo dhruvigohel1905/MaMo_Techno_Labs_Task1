@@ -29,7 +29,7 @@ export class OrgController {
 
   async getById(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const org = await orgService.getById(req.params.id);
+      const org = await orgService.getById((req.params.id as string));
       res.json({ success: true, data: org });
     } catch (error) {
       next(error);
@@ -47,7 +47,7 @@ export class OrgController {
 
   async update(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const org = await orgService.update(req.params.id, req.body, req.user._id);
+      const org = await orgService.update((req.params.id as string), req.body, req.user._id);
       res.json({ success: true, data: org });
     } catch (error) {
       next(error);
@@ -63,7 +63,7 @@ export class OrgController {
       const { url } = await uploadToCloudinary(req.file.buffer, 'logos');
       const Organization = (await import('./org.model')).default;
       const org = await Organization.findOneAndUpdate(
-        { _id: req.params.id, admin: req.user._id },
+        { _id: (req.params.id as string), admin: req.user._id },
         { logo: url },
         { new: true }
       );
@@ -75,7 +75,7 @@ export class OrgController {
 
   async approve(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const org = await orgService.approve(req.params.id);
+      const org = await orgService.approve((req.params.id as string));
       res.json({ success: true, data: org });
     } catch (error) {
       next(error);
@@ -84,7 +84,7 @@ export class OrgController {
 
   async reject(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const org = await orgService.reject(req.params.id, req.body.reason || '');
+      const org = await orgService.reject((req.params.id as string), req.body.reason || '');
       res.json({ success: true, data: org });
     } catch (error) {
       next(error);

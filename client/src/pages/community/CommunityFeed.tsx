@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../../utils/api';
 import { useAppSelector } from '../../hooks/useRedux';
-import { HiOutlineHeart, HiOutlineChatAlt2, HiOutlinePhotograph } from 'react-icons/hi';
+import { HiOutlineHeart, HiOutlineChatAlt2, HiOutlinePhotograph, HiOutlineX } from 'react-icons/hi';
 
 const CommunityFeed = () => {
   const { user } = useAppSelector((s) => s.auth);
   const [posts, setPosts] = useState<any[]>([]);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [posting, setPosting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchPosts(); }, []);
 
@@ -15,13 +19,49 @@ const CommunityFeed = () => {
     api.get('/community/posts').then((r) => setPosts(r.data.data.posts || [])).catch(() => {}).finally(() => setLoading(false));
   };
 
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB');
+      return;
+    }
+    setSelectedImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handlePost = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !selectedImage) return;
     try {
-      await api.post('/community/posts', { content });
+      setPosting(true);
+      const formData = new FormData();
+      formData.append('content', content);
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+      await api.post('/community/posts', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setContent('');
+      removeImage();
       fetchPosts();
-    } catch {}
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to create post');
+    } finally {
+      setPosting(false);
+    }
   };
 
   const handleLike = async (postId: string) => {
@@ -41,9 +81,34 @@ const CommunityFeed = () => {
           <div className="w-10 h-10 rounded-xl gradient-accent flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{user?.firstName?.[0]}{user?.lastName?.[0]}</div>
           <div className="flex-1">
             <textarea value={content} onChange={(e) => setContent(e.target.value)} className="input-field resize-none h-20" placeholder="Share something with the community..." />
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative mt-3 rounded-xl overflow-hidden border border-[var(--border-color)]">
+                <img src={imagePreview} alt="Preview" className="max-h-48 w-full object-cover" />
+                <button
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors"
+                >
+                  <HiOutlineX className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center justify-between mt-3">
-              <button className="btn-secondary !py-1.5 !px-3 text-xs"><HiOutlinePhotograph className="w-4 h-4" /> Photo</button>
-              <button onClick={handlePost} disabled={!content.trim()} className="btn-primary !py-1.5 !px-5 text-sm">Post</button>
+              <button onClick={handlePhotoClick} className="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5">
+                <HiOutlinePhotograph className="w-4 h-4" /> Photo
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <button onClick={handlePost} disabled={(!content.trim() && !selectedImage) || posting} className="btn-primary !py-1.5 !px-5 text-sm">
+                {posting ? 'Posting...' : 'Post'}
+              </button>
             </div>
           </div>
         </div>

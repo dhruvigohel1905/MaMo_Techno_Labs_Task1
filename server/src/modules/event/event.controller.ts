@@ -46,7 +46,7 @@ export class EventController {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const event = await eventService.getById(req.params.id);
+      const event = await eventService.getById((req.params.id as string));
       res.json({ success: true, data: event });
     } catch (error) {
       next(error);
@@ -55,7 +55,7 @@ export class EventController {
 
   async update(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const event = await eventService.update(req.params.id, req.body, req.user._id);
+      const event = await eventService.update((req.params.id as string), req.body, req.user._id);
       res.json({ success: true, data: event });
     } catch (error) {
       next(error);
@@ -64,7 +64,7 @@ export class EventController {
 
   async delete(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await eventService.delete(req.params.id, req.user._id);
+      const result = await eventService.delete((req.params.id as string), req.user._id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -73,7 +73,7 @@ export class EventController {
 
   async approve(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const event = await eventService.approve(req.params.id);
+      const event = await eventService.approve((req.params.id as string));
       res.json({ success: true, data: event });
     } catch (error) {
       next(error);
@@ -82,7 +82,7 @@ export class EventController {
 
   async reject(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const event = await eventService.reject(req.params.id, req.body.reason);
+      const event = await eventService.reject((req.params.id as string), req.body.reason);
       res.json({ success: true, data: event });
     } catch (error) {
       next(error);
@@ -97,7 +97,7 @@ export class EventController {
       }
       const { url } = await uploadToCloudinary(req.file.buffer, 'banners');
       const event = await Event.findOneAndUpdate(
-        { _id: req.params.id, createdBy: req.user._id },
+        { _id: (req.params.id as string), createdBy: req.user._id },
         { banner: url },
         { new: true }
       );
@@ -109,7 +109,7 @@ export class EventController {
 
   async getQRCode(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const result = await eventService.getQRCode(req.params.id, req.user._id);
+      const result = await eventService.getQRCode((req.params.id as string), req.user._id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

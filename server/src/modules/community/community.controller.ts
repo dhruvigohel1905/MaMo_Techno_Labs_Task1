@@ -1,13 +1,22 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../../middleware/auth';
 import { CommunityService } from './community.service';
+import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
 
 const communityService = new CommunityService();
 
 export class CommunityController {
   async createPost(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const post = await communityService.createPost(req.body, req.user._id);
+      let imageUrl = '';
+      if (req.file) {
+        const { url } = await uploadToCloudinary(req.file.buffer, 'community');
+        imageUrl = url;
+      }
+      const post = await communityService.createPost(
+        { ...req.body, image: imageUrl || req.body.image },
+        req.user._id
+      );
       res.status(201).json({ success: true, data: post });
     } catch (error) {
       next(error);
@@ -27,7 +36,7 @@ export class CommunityController {
 
   async getPostById(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const post = await communityService.getPostById(req.params.id);
+      const post = await communityService.getPostById((req.params.id as string));
       res.json({ success: true, data: post });
     } catch (error) {
       next(error);
@@ -37,7 +46,7 @@ export class CommunityController {
   async deletePost(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const result = await communityService.deletePost(
-        req.params.id, req.user._id, req.user.role === 'admin'
+        (req.params.id as string), req.user._id, req.user.role === 'admin'
       );
       res.json({ success: true, data: result });
     } catch (error) {
@@ -47,7 +56,7 @@ export class CommunityController {
 
   async toggleLike(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const post = await communityService.toggleLike(req.params.id, req.user._id);
+      const post = await communityService.toggleLike((req.params.id as string), req.user._id);
       res.json({ success: true, data: post });
     } catch (error) {
       next(error);
@@ -56,7 +65,7 @@ export class CommunityController {
 
   async addComment(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const comment = await communityService.addComment(req.params.id, req.body.content, req.user._id);
+      const comment = await communityService.addComment((req.params.id as string), req.body.content, req.user._id);
       res.status(201).json({ success: true, data: comment });
     } catch (error) {
       next(error);
@@ -66,7 +75,7 @@ export class CommunityController {
   async getComments(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const result = await communityService.getComments(req.params.id, page);
+      const result = await communityService.getComments((req.params.id as string), page);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -76,7 +85,7 @@ export class CommunityController {
   async deleteComment(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const result = await communityService.deleteComment(
-        req.params.id, req.user._id, req.user.role === 'admin'
+        (req.params.id as string), req.user._id, req.user.role === 'admin'
       );
       res.json({ success: true, data: result });
     } catch (error) {

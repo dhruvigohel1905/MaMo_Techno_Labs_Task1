@@ -13,8 +13,8 @@ export class AuthService {
     }
 
     const user = await User.create(data);
-    const accessToken = generateAccessToken(user._id as string);
-    const refreshToken = generateRefreshToken(user._id as string);
+    const accessToken = generateAccessToken(user._id as unknown as string);
+    const refreshToken = generateRefreshToken(user._id as unknown as string);
 
     return {
       user: {
@@ -45,8 +45,8 @@ export class AuthService {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const accessToken = generateAccessToken(user._id as string);
-    const refreshToken = generateRefreshToken(user._id as string);
+    const accessToken = generateAccessToken(user._id as unknown as string);
+    const refreshToken = generateRefreshToken(user._id as unknown as string);
 
     return {
       user: {

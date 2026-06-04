@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { CommunityController } from './community.controller';
 import { protect } from '../../middleware/auth';
+import { upload } from '../../middleware/upload';
 
 const router = Router();
 const controller = new CommunityController();
 
 router.use(protect);
-router.post('/posts', controller.createPost);
+router.post('/posts', upload.single('image'), controller.createPost);
 router.get('/posts', controller.getPosts);
 router.get('/posts/:id', controller.getPostById);
 router.delete('/posts/:id', controller.deletePost);

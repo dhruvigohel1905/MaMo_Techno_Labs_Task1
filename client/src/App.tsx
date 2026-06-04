@@ -23,6 +23,10 @@ import ScanQR from './pages/events/ScanQR';
 import UserDashboard from './pages/dashboard/UserDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import AdminModeration from './pages/dashboard/AdminModeration';
+import AdminUsers from './pages/dashboard/AdminUsers';
+import AdminEvents from './pages/dashboard/AdminEvents';
+import AdminOrganizations from './pages/dashboard/AdminOrganizations';
+import AdminAnalytics from './pages/dashboard/AdminAnalytics';
 import OrgDashboard from './pages/dashboard/OrgDashboard';
 import MyEvents from './pages/dashboard/MyEvents';
 import OrgEvents from './pages/dashboard/OrgEvents';
@@ -85,11 +89,11 @@ function AppContent() {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminDashboard />} />
-                <Route path="/admin/organizations" element={<AdminDashboard />} />
-                <Route path="/admin/events" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/organizations" element={<AdminOrganizations />} />
+                <Route path="/admin/events" element={<AdminEvents />} />
                 <Route path="/admin/moderation" element={<AdminModeration />} />
-                <Route path="/admin/analytics" element={<AdminDashboard />} />
+                <Route path="/admin/analytics" element={<AdminAnalytics />} />
               </Route>
             </Route>
 
