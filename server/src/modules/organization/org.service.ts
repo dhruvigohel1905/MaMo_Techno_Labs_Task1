@@ -40,7 +40,7 @@ export class OrgService {
   async update(orgId: string, data: any, userId: string) {
     const org = await Organization.findById(orgId);
     if (!org) throw new AppError('Organization not found', 404);
-    if (org.admin.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (org.admin.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
 
     Object.assign(org, data);
     await org.save();

@@ -33,6 +33,7 @@ import OrgEvents from './pages/dashboard/OrgEvents';
 import OrgProfile from './pages/dashboard/OrgProfile';
 import Notifications from './pages/dashboard/Notifications';
 import MyCertificates from './pages/certificates/MyCertificates';
+import CertificateVerify from './pages/certificates/CertificateVerify';
 import CommunityFeed from './pages/community/CommunityFeed';
 import NotFound from './pages/NotFound';
 
@@ -56,6 +57,7 @@ function AppContent() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />
+            <Route path="/certificates/verify/:code" element={<CertificateVerify />} />
 
             {/* Guest Only */}
             <Route element={<GuestRoute />}>
@@ -70,6 +72,7 @@ function AppContent() {
                 <Route path="/dashboard/events" element={<MyEvents />} />
                 <Route path="/dashboard/certificates" element={<MyCertificates />} />
                 <Route path="/notifications" element={<Notifications />} />
+                <Route path="/scan" element={<ScanQR />} />
               </Route>
               <Route path="/community" element={<CommunityFeed />} />
             </Route>

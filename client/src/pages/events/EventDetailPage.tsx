@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAppSelector } from '../../hooks/useRedux';
 import type { Event as EventType } from '../../types';
-import { HiOutlineCalendar, HiOutlineLocationMarker, HiOutlineUserGroup, HiOutlineClock, HiOutlineArrowLeft } from 'react-icons/hi';
+import { HiOutlineCalendar, HiOutlineLocationMarker, HiOutlineUserGroup, HiOutlineClock, HiOutlineArrowLeft, HiOutlineClipboardCopy } from 'react-icons/hi';
 
 const EventDetailPage = () => {
   const { id } = useParams();
@@ -106,6 +106,29 @@ const EventDetailPage = () => {
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Event ID Card */}
+          <div className="card">
+            <p className="text-xs text-[var(--text-tertiary)] mb-2">Event ID</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 text-xs font-mono bg-[var(--bg-tertiary)] px-3 py-2 rounded-lg truncate select-all">
+                {event._id}
+              </code>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(event._id);
+                  const btn = document.getElementById('copy-event-id');
+                  if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy'; }, 2000); }
+                }}
+                className="px-3 py-2 rounded-lg text-xs font-medium bg-primary-500/10 text-primary-600 dark:text-primary-400 hover:bg-primary-500/20 transition-all flex items-center gap-1 flex-shrink-0"
+                id="copy-event-id"
+              >
+                <HiOutlineClipboardCopy className="w-3.5 h-3.5" />
+                Copy
+              </button>
+            </div>
+            <p className="text-[10px] text-[var(--text-tertiary)] mt-2">Use this ID for manual attendance marking in the QR Scanner page.</p>
           </div>
 
           {/* Organizer Card */}

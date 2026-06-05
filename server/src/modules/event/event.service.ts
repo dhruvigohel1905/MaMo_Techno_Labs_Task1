@@ -4,22 +4,24 @@ import Notification from '../notification/notification.model';
 import Organization from '../organization/org.model';
 import { AppError } from '../../middleware/errorHandler';
 import { generateQRCode } from '../../utils/generateQR';
-import { v4 as uuidv4 } from 'uuid';
 
 export class EventService {
   async create(data: any, userId: string) {
     const org = await Organization.findOne({ admin: userId, status: 'approved' });
     if (!org) throw new AppError('You need an approved organization to create events', 403);
 
-    const qrData = JSON.stringify({ eventId: uuidv4(), timestamp: Date.now() });
-    const qrCode = await generateQRCode(qrData);
-
+    // Create event first, then generate QR with the real event ID
     const event = await Event.create({
       ...data,
       organization: org._id,
       createdBy: userId,
-      qrCode,
     });
+
+    // Generate QR code with the actual event MongoDB _id
+    const qrData = JSON.stringify({ eventId: event._id.toString(), type: 'attendance' });
+    const qrCode = await generateQRCode(qrData);
+    event.qrCode = qrCode;
+    await event.save();
 
     const admins = await User.find({ role: 'admin' });
     const notifications = admins.map(admin => ({
@@ -91,7 +93,7 @@ export class EventService {
   async update(eventId: string, data: any, userId: string) {
     const event = await Event.findById(eventId);
     if (!event) throw new AppError('Event not found', 404);
-    if (event.createdBy.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (event.createdBy.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
 
     Object.assign(event, data);
     if (event.status === 'rejected') event.status = 'pending'; // Re-submit
@@ -102,7 +104,7 @@ export class EventService {
   async delete(eventId: string, userId: string) {
     const event = await Event.findById(eventId);
     if (!event) throw new AppError('Event not found', 404);
-    if (event.createdBy.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (event.createdBy.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
     await Event.findByIdAndDelete(eventId);
     return { message: 'Event deleted successfully' };
   }
@@ -144,7 +146,7 @@ export class EventService {
   async getQRCode(eventId: string, userId: string) {
     const event = await Event.findById(eventId);
     if (!event) throw new AppError('Event not found', 404);
-    if (event.createdBy.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (event.createdBy.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
 
     // Regenerate QR with event ID for scanning
     const qrData = JSON.stringify({ eventId: event._id, type: 'attendance' });

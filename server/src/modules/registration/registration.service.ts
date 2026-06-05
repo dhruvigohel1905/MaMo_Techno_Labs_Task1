@@ -64,7 +64,7 @@ export class RegistrationService {
   async getEventRegistrations(eventId: string, userId: string) {
     const event = await Event.findById(eventId);
     if (!event) throw new AppError('Event not found', 404);
-    if (event.createdBy.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (event.createdBy.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
 
     const registrations = await Registration.find({ event: eventId, status: 'registered' })
       .populate('user', 'firstName lastName email avatar')

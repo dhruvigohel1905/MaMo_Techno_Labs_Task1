@@ -29,7 +29,7 @@ export class CommunityService {
   async deletePost(postId: string, userId: string, isAdmin: boolean = false) {
     const post = await Post.findById(postId);
     if (!post) throw new AppError('Post not found', 404);
-    if (post.author.toString() !== userId && !isAdmin) {
+    if (post.author.toString() !== userId.toString() && !isAdmin) {
       throw new AppError('Not authorized', 403);
     }
     await Post.findByIdAndDelete(postId);
@@ -76,7 +76,7 @@ export class CommunityService {
   async deleteComment(commentId: string, userId: string, isAdmin: boolean = false) {
     const comment = await Comment.findById(commentId);
     if (!comment) throw new AppError('Comment not found', 404);
-    if (comment.author.toString() !== userId && !isAdmin) {
+    if (comment.author.toString() !== userId.toString() && !isAdmin) {
       throw new AppError('Not authorized', 403);
     }
     await Comment.findByIdAndDelete(commentId);

@@ -8,6 +8,23 @@ const certificateService = new CertificateService();
 
 export class AttendanceService {
   async markAttendance(eventId: string, userId: string, method: 'qr' | 'manual' = 'qr') {
+    const event = await Event.findById(eventId);
+    if (!event) throw new AppError('Event not found', 404);
+
+    const now = new Date().getTime();
+    const eventStartTime = new Date(event.startDate).getTime();
+    
+    // Allow check-in up to 2 hours before the event starts
+    if (now < eventStartTime - (2 * 60 * 60 * 1000)) {
+      throw new AppError('Attendance cannot be marked before the event starts.', 400);
+    }
+    
+    // Prevent check-in if the event ended more than 24 hours ago
+    const eventEndTime = new Date(event.endDate).getTime();
+    if (now > eventEndTime + (24 * 60 * 60 * 1000)) {
+      throw new AppError('This event has already ended.', 400);
+    }
+
     const registration = await Registration.findOne({ user: userId, event: eventId, status: 'registered' });
     if (!registration) throw new AppError('User is not registered for this event', 400);
 
@@ -41,7 +58,7 @@ export class AttendanceService {
   async getEventAttendance(eventId: string, userId: string) {
     const event = await Event.findById(eventId);
     if (!event) throw new AppError('Event not found', 404);
-    if (event.createdBy.toString() !== userId) throw new AppError('Not authorized', 403);
+    if (event.createdBy.toString() !== userId.toString()) throw new AppError('Not authorized', 403);
 
     const attendance = await Attendance.find({ event: eventId })
       .populate('user', 'firstName lastName email avatar')
